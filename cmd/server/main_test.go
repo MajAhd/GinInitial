@@ -8,29 +8,30 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"gininitial/internal/api"
+
 	"github.com/gin-gonic/gin"
 )
 
-func TestPingRoute(t *testing.T) {
-	// Switch to test mode to avoid unnecessary logs
+func TestPingRouteV1(t *testing.T) {
+	// Prevent unnecessary Gin mode logging noise
 	gin.SetMode(gin.TestMode)
 
-	// Create a dummy logger that writes to a buffer for tests
+	// Suppress standard log output by pushing it to a buffer
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
 
-	router := setupRouter(logger)
+	router := api.SetupRouter(logger)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/ping", nil)
+	// Note: We use the v1 path since versions are grouped in api/router.go
+	req, _ := http.NewRequest("GET", "/api/v1/ping", nil)
 	router.ServeHTTP(w, req)
 
-	// Check status code
 	if w.Code != http.StatusOK {
 		t.Errorf("Expected status %d but instead got %d", http.StatusOK, w.Code)
 	}
 
-	// Check response body
 	var response map[string]string
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	if err != nil {
@@ -38,6 +39,9 @@ func TestPingRoute(t *testing.T) {
 	}
 
 	if response["message"] != "pong" {
-		t.Errorf("Expected message to be 'pong' but instead got '%s'", response["message"])
+		t.Errorf("Expected message 'pong' but got '%s'", response["message"])
+	}
+	if response["version"] != "v1" {
+		t.Errorf("Expected version 'v1' but got '%s'", response["version"])
 	}
 }

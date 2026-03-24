@@ -31,7 +31,7 @@ dev:
 ## Build the production binary locally
 build: go.sum clean
 	mkdir -p $(BIN_DIR)
-	go build -ldflags="-w -s" -o $(BIN_DIR)/$(APP_NAME) main.go
+	go build -ldflags="-w -s" -o $(BIN_DIR)/$(APP_NAME) ./cmd/server
 
 ## Run the binary locally
 run: build
@@ -39,7 +39,7 @@ run: build
 
 ## Run the app in production-like mode directly
 run-prod:
-	GIN_MODE=release go run main.go
+	GIN_MODE=release go run cmd/server/main.go
 
 ## Build production docker image
 docker-build:
@@ -53,9 +53,14 @@ docker-prod: docker-build
 test: go.sum
 	go test -v -cover ./...
 
-## Run golangci-lint
+## Run static analysis and linting
 lint: go.sum
-	golangci-lint run
+	go vet ./...
+	@if command -v golangci-lint >/dev/null 2>&1; then \
+		golangci-lint run; \
+	else \
+		echo "golangci-lint not installed, running native vet only."; \
+	fi
 
 ## Format code
 format:
