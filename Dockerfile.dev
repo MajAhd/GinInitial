@@ -1,0 +1,18 @@
+FROM golang:1.23-alpine
+
+WORKDIR /app
+
+# Install git and air for hot-reloading
+RUN apk add --no-cache git tzdata build-base
+RUN go install github.com/air-verse/air@latest && \
+    go install github.com/go-delve/delve/cmd/dlv@latest
+
+# Copy module files
+COPY go.mod go.sum* ./
+RUN go mod download
+
+# We don't need to copy the source here because it will be mounted via volumes for dev
+
+EXPOSE 8080
+
+CMD ["air", "-c", ".air.toml"]

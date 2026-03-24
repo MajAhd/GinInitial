@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: gin_app_dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    environment:
+      - PORT=8080
+      - GIN_MODE=debug
+    restart: unless-stopped
+    # Add other services like db, redis, etc. below, e.g.:
+    # db:
+    #   image: postgres:15
