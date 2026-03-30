@@ -72,7 +72,7 @@ tidy:
 
 ## Clean build artifacts
 clean:
-	rm -rf $(BIN_DIR)/ tmp/
+	rm -rf $(BIN_DIR)/ 
 
 ## Generate swagger api docs
 swagger:
