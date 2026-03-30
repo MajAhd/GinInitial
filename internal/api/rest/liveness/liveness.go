@@ -32,7 +32,6 @@ func (pc *LivenessController) RegisterRoutes(rg *gin.RouterGroup) {
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Router       /health/liveness [get]
-// @Router       /health/liveness [post]
 func (pc *LivenessController) livenessHandler(c *gin.Context) {
 	pc.logger.Debug("Liveness endpoint hit", slog.String("endpoint", "/health/liveness"))
 	c.JSON(http.StatusOK, gin.H{
@@ -48,7 +47,6 @@ func (pc *LivenessController) livenessHandler(c *gin.Context) {
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
 // @Router       /health/readiness [get]
-// @Router       /health/readiness [post]
 func (pc *LivenessController) readinessHandler(c *gin.Context) {
 	pc.logger.Debug("Readiness endpoint hit", slog.String("endpoint", "/health/readiness"))
 	c.JSON(http.StatusOK, gin.H{

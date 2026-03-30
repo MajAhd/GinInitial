@@ -58,48 +58,10 @@
                         }
                     }
                 }
-            },
-            "post": {
-                "description": "Reports the vital status of the app",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Health"
-                ],
-                "summary": "Liveness Check",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
             }
         },
         "/health/readiness": {
             "get": {
-                "description": "Reports if the app is ready to serve traffic",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Health"
-                ],
-                "summary": "Readiness Check",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "post": {
                 "description": "Reports if the app is ready to serve traffic",
                 "produces": [
                     "application/json"

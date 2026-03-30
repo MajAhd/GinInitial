@@ -41,34 +41,8 @@ paths:
       summary: Liveness Check
       tags:
       - Health
-    post:
-      description: Reports the vital status of the app
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Liveness Check
-      tags:
-      - Health
   /health/readiness:
     get:
-      description: Reports if the app is ready to serve traffic
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Readiness Check
-      tags:
-      - Health
-    post:
       description: Reports if the app is ready to serve traffic
       produces:
       - application/json
