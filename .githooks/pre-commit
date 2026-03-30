@@ -12,3 +12,9 @@ make swagger
 git add docs/
 
 echo "Swagger documentation updated successfully!"
+
+make format 
+echo "Code formatted successfully!"
+
+make lint
+echo "Code linted successfully!"
