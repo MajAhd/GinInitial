@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"gininitial/internal/api/graphql"
+	liveness "gininitial/internal/api/rest/liveness"
 	v1 "gininitial/internal/api/rest/v1"
 	"gininitial/internal/middleware"
 
@@ -18,9 +19,16 @@ func SetupRouter(logger *slog.Logger) *gin.Engine {
 	r.Use(gin.Recovery())
 	r.Use(middleware.SlogMiddleware(logger))
 
+	health := r.Group("/health")
+	// Get Liveness and Readiness
+	restLiveness := health.Group("/")
+	{
+		livenessController := liveness.NewLivenessController(logger)
+		livenessController.RegisterRoutes(restLiveness)
+	}
+
 	// Base API grouping
 	api := r.Group("/api")
-
 	// --- REST API v1 ---
 	restV1 := api.Group("/v1")
 	{
