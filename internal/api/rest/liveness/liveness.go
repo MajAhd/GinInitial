@@ -39,6 +39,13 @@ func (pc *LivenessController) RegisterRoutes(rg *gin.RouterGroup) {
 	rg.OPTIONS("/readiness", pc.readinessHandler)
 }
 
+// @Summary      Liveness Check
+// @Description  Reports the vital status of the app
+// @Tags         Health
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}
+// @Router       /health/liveness [get]
+// @Router       /health/liveness [post]
 func (pc *LivenessController) livenessHandler(c *gin.Context) {
 	pc.logger.Debug("Liveness endpoint hit", slog.String("endpoint", "/health/liveness"))
 	c.JSON(http.StatusOK, gin.H{
@@ -48,6 +55,13 @@ func (pc *LivenessController) livenessHandler(c *gin.Context) {
 	})
 }
 
+// @Summary      Readiness Check
+// @Description  Reports if the app is ready to serve traffic
+// @Tags         Health
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}
+// @Router       /health/readiness [get]
+// @Router       /health/readiness [post]
 func (pc *LivenessController) readinessHandler(c *gin.Context) {
 	pc.logger.Debug("Readiness endpoint hit", slog.String("endpoint", "/health/readiness"))
 	c.JSON(http.StatusOK, gin.H{

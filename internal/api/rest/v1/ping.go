@@ -24,6 +24,12 @@ func (pc *PingController) RegisterRoutes(rg *gin.RouterGroup) {
 	rg.GET("/ping", pc.pingHandler)
 }
 
+// @Summary      Ping endpoint
+// @Description  Responds with a pong payload
+// @Tags         Ping
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}
+// @Router       /api/v1/ping [get]
 func (pc *PingController) pingHandler(c *gin.Context) {
 	pc.logger.Debug("Ping endpoint hit", slog.String("endpoint", "/api/v1/ping"))
 	c.JSON(http.StatusOK, gin.H{

@@ -1,0 +1,84 @@
+basePath: /
+host: localhost:8081
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a blueprint server for a Gin API structure.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Gin Initial Blueprint API
+  version: "1.0"
+paths:
+  /api/v1/ping:
+    get:
+      description: Responds with a pong payload
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Ping endpoint
+      tags:
+      - Ping
+  /health/liveness:
+    get:
+      description: Reports the vital status of the app
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Liveness Check
+      tags:
+      - Health
+    post:
+      description: Reports the vital status of the app
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Liveness Check
+      tags:
+      - Health
+  /health/readiness:
+    get:
+      description: Reports if the app is ready to serve traffic
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Readiness Check
+      tags:
+      - Health
+    post:
+      description: Reports if the app is ready to serve traffic
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Readiness Check
+      tags:
+      - Health
+swagger: "2.0"

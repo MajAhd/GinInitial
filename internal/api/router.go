@@ -3,12 +3,15 @@ package api
 import (
 	"log/slog"
 
+	_ "gininitial/docs"
 	"gininitial/internal/api/graphql"
 	liveness "gininitial/internal/api/rest/liveness"
 	v1 "gininitial/internal/api/rest/v1"
 	"gininitial/internal/middleware"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // SetupRouter strictly forms the route structure of our service
@@ -18,6 +21,9 @@ func SetupRouter(logger *slog.Logger) *gin.Engine {
 	// Global Middleware
 	r.Use(gin.Recovery())
 	r.Use(middleware.SlogMiddleware(logger))
+
+	// Serve Swagger UI
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	health := r.Group("/health")
 	// Get Liveness and Readiness
