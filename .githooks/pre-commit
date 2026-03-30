@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Ensure any failure stops the commit
+set -e
+
+echo "Running pre-commit hook: Generating Swagger Docs..."
+
+# Re-generate swagger docs
+make swagger
+
+# Automatically stage the generated documentation files
+git add docs/
+
+echo "Swagger documentation updated successfully!"

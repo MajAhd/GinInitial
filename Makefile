@@ -77,3 +77,8 @@ clean:
 ## Generate swagger api docs
 swagger:
 	go run github.com/swaggo/swag/cmd/swag@latest init -g cmd/server/main.go --parseInternal -o docs
+
+## Install git hooks
+install-hooks:
+	git config core.hooksPath .githooks
+	chmod +x .githooks/*
