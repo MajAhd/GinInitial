@@ -14,46 +14,59 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// RouterDependencies contains all shared app dependencies like logging, DB connections, etc.
+type RouterDependencies struct {
+	Logger *slog.Logger
+	// DB     *gorm.DB   (example for the future)
+	// Config *Config    (example for the future)
+}
+
 // SetupRouter strictly forms the route structure of our service
-func SetupRouter(logger *slog.Logger) *gin.Engine {
+func SetupRouter(deps RouterDependencies) *gin.Engine {
 	r := gin.New()
 
 	// Global Middleware
 	r.Use(gin.Recovery())
-	r.Use(middleware.SlogMiddleware(logger))
+	r.Use(middleware.SlogMiddleware(deps.Logger))
 
 	// Serve Swagger UI
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	health := r.Group("/health")
-	// Get Liveness and Readiness
-	restLiveness := health.Group("/")
-	{
-		livenessController := liveness.NewLivenessController(logger)
-		livenessController.RegisterRoutes(restLiveness)
-	}
+	// Break down the routing logic into cleanly decoupled modules
+	setupHealthRoutes(r, deps)
+	setupAPIRoutes(r, deps)
+	setupGraphQLRoutes(r, deps)
 
-	// Base API grouping
+	return r
+}
+
+func setupHealthRoutes(r *gin.Engine, deps RouterDependencies) {
+	health := r.Group("/health")
+	{
+		livenessController := liveness.NewLivenessController(deps.Logger)
+		livenessController.RegisterRoutes(health)
+	}
+}
+
+func setupAPIRoutes(r *gin.Engine, deps RouterDependencies) {
 	api := r.Group("/api")
+
 	// --- REST API v1 ---
 	restV1 := api.Group("/v1")
 	{
-		pingController := v1.NewPingController(logger)
+		pingController := v1.NewPingController(deps.Logger)
 		pingController.RegisterRoutes(restV1)
-		// Add more v1 controllers here
+		// Add more v1 controllers here dynamically
 	}
 
 	// --- REST API v2 (Placeholder for future versioning) ---
 	// restV2 := api.Group("/v2")
-	// {
-	//    Add v2 controllers here to avoid breaking v1 contracts
-	// }
+	// { ... }
+}
 
-	// --- GraphQL API ---
-	gqlGroup := api.Group("/graphql")
+func setupGraphQLRoutes(r *gin.Engine, deps RouterDependencies) {
+	gqlGroup := r.Group("/api/graphql")
 	{
-		graphql.RegisterRoutes(gqlGroup, logger)
+		graphql.RegisterRoutes(gqlGroup, deps.Logger)
 	}
-
-	return r
 }

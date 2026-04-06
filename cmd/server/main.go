@@ -53,7 +53,11 @@ func main() {
 		port = "8080"
 	}
 
-	r := api.SetupRouter(logger)
+	deps := api.RouterDependencies{
+		Logger: logger,
+	}
+
+	r := api.SetupRouter(deps)
 
 	logger.Info("Starting server", slog.String("port", port))
 	if err := r.Run(":" + port); err != nil {

@@ -21,7 +21,11 @@ func TestPingRouteV1(t *testing.T) {
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
 
-	router := api.SetupRouter(logger)
+	deps := api.RouterDependencies{
+		Logger: logger,
+	}
+
+	router := api.SetupRouter(deps)
 
 	w := httptest.NewRecorder()
 	// Note: We use the v1 path since versions are grouped in api/router.go
