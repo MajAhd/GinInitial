@@ -28,6 +28,7 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 	// Global Middleware
 	r.Use(gin.Recovery())
 	r.Use(middleware.SlogMiddleware(deps.Logger))
+	r.Use(middleware.ErrorHandler())
 
 	// Serve Swagger UI
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

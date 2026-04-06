@@ -45,6 +45,27 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/ping/:id": {
+            "get": {
+                "description": "Responds with a pong payload with ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ping"
+                ],
+                "summary": "Ping endpoint with ID",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/health/liveness": {
             "get": {
                 "description": "Reports the vital status of the app",
