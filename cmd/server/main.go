@@ -2,6 +2,8 @@ package main
 
 import (
 	"gininitial/internal/api"
+	"gininitial/internal/database"
+	"gininitial/internal/models"
 
 	"github.com/joho/godotenv"
 
@@ -54,8 +56,17 @@ func main() {
 		port = "8080"
 	}
 
+	db := database.InitDB(logger)
+	defer db.Close()
+
+	// Automatically run our DB testing schema migrations
+	if err := database.Migrate(db, (*models.User)(nil)); err != nil {
+		logger.Error("Migration Error", slog.String("error", err.Error()))
+	}
+
 	deps := api.RouterDependencies{
 		Logger: logger,
+		DB:     db,
 	}
 
 	r := api.SetupRouter(deps)

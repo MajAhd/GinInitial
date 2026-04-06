@@ -13,12 +13,13 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/uptrace/bun"
 )
 
 // RouterDependencies contains all shared app dependencies like logging, DB connections, etc.
 type RouterDependencies struct {
 	Logger *slog.Logger
-	// DB     *gorm.DB   (example for the future)
+	DB     *bun.DB
 	// Config *Config    (example for the future)
 }
 

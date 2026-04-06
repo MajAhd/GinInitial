@@ -32,3 +32,7 @@ go mod tidy
 ```
 
 No external logging libraries (such as `logrus` or `zerolog`) were used. We integrated Go's native standard library system **`log/slog`** with a custom logging middleware in `main.go`. This keeps the final binary incredibly small and lightweight while still achieving production-grade JSON logging.
+
+
+## ORM
+BUN ORM https://bun.uptrace.dev/guide/golang-orm.html#quick-start
