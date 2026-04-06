@@ -14,7 +14,7 @@ func SlogMiddleware(logger *slog.Logger) gin.HandlerFunc {
 
 		c.Next()
 
-		latency := time.Since(start)
+		latency := time.Since(start).Milliseconds()
 		status := c.Writer.Status()
 
 		msg := "HTTP Request"
@@ -23,7 +23,7 @@ func SlogMiddleware(logger *slog.Logger) gin.HandlerFunc {
 			slog.String("method", c.Request.Method),
 			slog.String("path", c.Request.URL.Path),
 			slog.String("ip", c.ClientIP()),
-			slog.Duration("latency", latency),
+			slog.Int64("latency_ms", latency),
 			slog.String("user_agent", c.Request.UserAgent()),
 		}
 
