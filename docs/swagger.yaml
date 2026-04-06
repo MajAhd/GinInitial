@@ -27,20 +27,6 @@ paths:
       summary: Ping endpoint
       tags:
       - Ping
-  /api/v1/ping/:id:
-    get:
-      description: Responds with a pong payload with ID
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Ping endpoint with ID
-      tags:
-      - Ping
   /health/liveness:
     get:
       description: Reports the vital status of the app

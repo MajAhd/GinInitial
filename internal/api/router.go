@@ -7,6 +7,7 @@ import (
 	"gininitial/internal/api/graphql"
 	liveness "gininitial/internal/api/rest/liveness"
 	v1 "gininitial/internal/api/rest/v1"
+	ws "gininitial/internal/api/ws"
 	"gininitial/internal/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -29,9 +30,13 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 	r.Use(gin.Recovery())
 	r.Use(middleware.SlogMiddleware(deps.Logger))
 	r.Use(middleware.ErrorHandler())
+	r.TrustedPlatform = "X-CDN-Client-IP"
 
 	// Serve Swagger UI
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	// WebSocket endpoint
+	r.GET("/ws", ws.HandleWebSocket)
 
 	// Break down the routing logic into cleanly decoupled modules
 	setupHealthRoutes(r, deps)

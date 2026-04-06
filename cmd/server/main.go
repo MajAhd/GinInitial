@@ -2,6 +2,7 @@ package main
 
 import (
 	"gininitial/internal/api"
+
 	"github.com/joho/godotenv"
 
 	"log/slog"
