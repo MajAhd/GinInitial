@@ -40,9 +40,23 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 	r.GET("/ws", ws.HandleWebSocket)
 
 	// Break down the routing logic into cleanly decoupled modules
-	setupHealthRoutes(r, deps)
 	setupAPIRoutes(r, deps)
 	setupGraphQLRoutes(r, deps)
+
+	return r
+}
+
+func SetupHealthRouter(deps RouterDependencies) *gin.Engine {
+	r := gin.New()
+
+	// Global Middleware
+	r.Use(gin.Recovery())
+	r.Use(middleware.SlogMiddleware(deps.Logger))
+	r.Use(middleware.ErrorHandler())
+	r.TrustedPlatform = "X-CDN-Client-IP"
+
+	// Break down the routing logic into cleanly decoupled modules
+	setupHealthRoutes(r, deps)
 
 	return r
 }

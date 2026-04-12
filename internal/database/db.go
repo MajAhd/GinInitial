@@ -3,7 +3,9 @@ package database
 import (
 	"context"
 	"database/sql"
+	"gininitial/internal/config"
 	"log/slog"
+	"net/url"
 	"os"
 
 	"github.com/uptrace/bun"
@@ -12,11 +14,48 @@ import (
 	"github.com/uptrace/bun/extra/bundebug"
 )
 
+var logger *slog.Logger = config.InitLogger("database-service")
+
+func postgresDSNFromEnv() string {
+	host := os.Getenv("DB_HOSTNAME")
+	if host == "" {
+		host = "localhost"
+	}
+	port := os.Getenv("DB_PORT")
+	if port == "" {
+		port = "5432"
+	}
+	user := os.Getenv("DB_USERNAME")
+	if user == "" {
+		user = "postgres"
+	}
+	pass := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_DATABASE")
+	if dbname == "" {
+		dbname = "appdb"
+	}
+	sslmode := "require"
+	if os.Getenv("DB_SSL_DISABLED") == "true" {
+		sslmode = "disable"
+	}
+	u := &url.URL{
+		Scheme: "postgres",
+		User:   url.UserPassword(user, pass),
+		Host:   host + ":" + port,
+		Path:   "/" + dbname,
+	}
+	q := u.Query()
+	q.Set("sslmode", sslmode)
+	u.RawQuery = q.Encode()
+	return u.String()
+}
+
 // InitDB initializes PostgreSQL connection and configures Bun ORM
-func InitDB(logger *slog.Logger) *bun.DB {
-	dsn := os.Getenv("DATABASE_URL")
+func InitDB() *bun.DB {
+	dsn := postgresDSNFromEnv()
 	if dsn == "" {
-		dsn = "postgres://postgres:postgres@localhost:5432/appdb?sslmode=disable"
+		logger.Error("Database connection failed", slog.String("error", "DATABASE_URL is not set"))
+		os.Exit(1)
 	}
 
 	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))

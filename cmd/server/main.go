@@ -2,14 +2,14 @@ package main
 
 import (
 	"gininitial/internal/api"
+	config "gininitial/internal/config"
 	"gininitial/internal/database"
-	"gininitial/internal/models"
-
-	"github.com/joho/godotenv"
 
 	"log/slog"
 	"os"
 )
+
+var logger *slog.Logger = config.InitLogger("startup-service")
 
 // @title           Gin Initial Blueprint API
 // @version         1.0
@@ -26,29 +26,17 @@ import (
 // @host      localhost:8081
 // @BasePath  /
 
-func setupLogger() *slog.Logger {
-	logLevel := slog.LevelInfo
-	if envLevel := os.Getenv("LOG_LEVEL"); envLevel != "" {
-		if err := logLevel.UnmarshalText([]byte(envLevel)); err != nil {
-			logLevel = slog.LevelInfo
-		}
-	}
-
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: logLevel,
-	}))
-
-	slog.SetDefault(logger)
-	return logger
-}
-
+/*
+migrate-only mode for deploy pipelines / Kubernetes init containers:
+./server migrate
+Main process runs migrations then starts HTTP unless SKIP_DB_MIGRATE=true (when migrate already ran).
+*/
 func main() {
-	err := godotenv.Load()
+	config.LoadEnv()
 
-	logger := setupLogger()
-
-	if err != nil {
-		logger.Warn("No .env file found or error loading it. Using environment variables.")
+	if len(os.Args) > 1 && os.Args[1] == "migrate" {
+		database.RunMigrateCommand()
+		return
 	}
 
 	port := os.Getenv("PORT")
@@ -56,24 +44,48 @@ func main() {
 		port = "8080"
 	}
 
-	db := database.InitDB(logger)
-	defer db.Close()
+	db := database.InitDB()
+	defer func() {
+		if err := db.Close(); err != nil {
+			logger.Error("Database close failed", slog.String("error", err.Error()))
+		}
+	}()
 
-	// Automatically run our DB testing schema migrations
-	if err := database.Migrate(db, (*models.User)(nil)); err != nil {
-		logger.Error("Migration Error", slog.String("error", err.Error()))
+	if err := database.MigrateIfEnabled(db); err != nil {
+		logger.Error("Migration failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
+	apiLogger := config.InitLogger("Api")
+
 	deps := api.RouterDependencies{
-		Logger: logger,
+		Logger: apiLogger,
 		DB:     db,
 	}
 
-	r := api.SetupRouter(deps)
+	healthPort := os.Getenv("HEALTH_CHECK_PORT")
+	if healthPort == "" {
+		healthPort = "8040"
+	}
+	if healthPort == port {
+		logger.Error("PORT and HEALTH_CHECK_PORT must differ", slog.String("port", port), slog.String("healthCheckPort", healthPort))
+		os.Exit(1)
+	}
 
-	logger.Info("Starting server", slog.String("port", port))
-	if err := r.Run(":" + port); err != nil {
-		logger.Error("Server failed to start", slog.String("error", err.Error()))
+	apiEngine := api.SetupRouter(deps)
+	healthEngine := api.SetupHealthRouter(deps)
+
+	go func() {
+		logger.Info("Starting health server", slog.String("addr", ":"+healthPort))
+		if err := healthEngine.Run(":" + healthPort); err != nil {
+			logger.Error("Health server failed", slog.String("error", err.Error()))
+			os.Exit(1)
+		}
+	}()
+
+	logger.Info("Starting API server", slog.String("addr", ":"+port))
+	if err := apiEngine.Run(":" + port); err != nil {
+		logger.Error("API server failed", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
 }

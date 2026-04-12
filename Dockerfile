@@ -29,6 +29,7 @@ COPY --from=builder /app/server .
 # Copy .env configuration if exists
 COPY --from=builder /app/.env* ./
 
+# App Running
 EXPOSE 8080
 
 # Run the binary

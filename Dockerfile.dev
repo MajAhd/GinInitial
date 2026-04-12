@@ -14,5 +14,7 @@ RUN go mod download
 # We don't need to copy the source here because it will be mounted via volumes for dev
 
 EXPOSE 8080
+# Health Route only expose for Dev
+EXPOSE 8040
 
 CMD ["air", "-c", ".air.toml"]

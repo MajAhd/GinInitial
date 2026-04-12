@@ -3,6 +3,7 @@ package v1
 import (
 	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,7 @@ func NewLivenessController(logger *slog.Logger) *LivenessController {
 func (pc *LivenessController) RegisterRoutes(rg *gin.RouterGroup) {
 	rg.GET("/liveness", pc.livenessHandler)
 	rg.GET("/readiness", pc.readinessHandler)
+	rg.GET("/version", pc.versionHandler)
 }
 
 // @Summary      Liveness Check
@@ -53,5 +55,21 @@ func (pc *LivenessController) readinessHandler(c *gin.Context) {
 		"message": "read",
 		"method":  c.Request.Method,
 		"time":    time.Now(),
+	})
+}
+
+func (pc *LivenessController) versionHandler(c *gin.Context) {
+	pc.logger.Debug("Version endpoint hit", slog.String("endpoint", "/health/version"))
+	commit := os.Getenv("GIT_COMMIT")
+	if commit == "" {
+		commit = "dev"
+	}
+	version := os.Getenv("GIT_VERSION")
+	if version == "" {
+		version = "dev"
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"commit":  commit,
+		"version": version,
 	})
 }

@@ -8,16 +8,24 @@ services:
     container_name: gin_app_dev
     ports:
       - "8081:8080"
+      - "8040:8040"
     volumes:
       - .:/app
     environment:
       - PORT=8080
+      - HEALTH_CHECK_PORT=8040
+      - SKIP_DB_MIGRATE=false
       - GIN_MODE=debug
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/appdb?sslmode=disable
+      - DB_HOSTNAME=db
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=appdb
+      - DB_SSL_DISABLED=true
     restart: unless-stopped
     depends_on:
       - db
-  
+
   db:
     image: postgres:15-alpine
     environment:
