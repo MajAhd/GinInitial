@@ -8,7 +8,7 @@ import (
 
 func setupLogger() *slog.Logger {
 	logLevel := slog.LevelInfo
-	if envLevel := os.Getenv("LOG_LEVEL"); envLevel != "" {
+	if envLevel := ENV.App.APP_LOGLEVEL; envLevel != "" {
 		if err := logLevel.UnmarshalText([]byte(envLevel)); err != nil {
 			logLevel = slog.LevelInfo
 		}
