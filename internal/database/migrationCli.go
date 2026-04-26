@@ -1,6 +1,7 @@
 package database
 
 import (
+	config "gininitial/internal/config"
 	"gininitial/internal/models"
 	"log/slog"
 	"os"
@@ -23,9 +24,10 @@ func RunMigrateCommand() {
 }
 
 func MigrateIfEnabled(db *bun.DB) error {
-	if os.Getenv("SKIP_DB_MIGRATE") == "true" {
+	if config.ENV.App.SKIP_DB_MIGRATE == true {
 		logger.Info("SKIP_DB_MIGRATE is set: skipping database migration")
 		return nil
 	}
+	logger.Info("Running database migrations")
 	return Migrate(db, (*models.User)(nil))
 }

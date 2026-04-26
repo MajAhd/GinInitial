@@ -12,10 +12,6 @@ services:
     volumes:
       - .:/app
     environment:
-      - PORT=8080
-      - HEALTH_CHECK_PORT=8040
-      - SKIP_DB_MIGRATE=false
-      - GIN_MODE=debug
       - DB_HOSTNAME=db
       - DB_PORT=5432
       - DB_USERNAME=postgres

@@ -4,6 +4,7 @@ import (
 	"gininitial/internal/api"
 	config "gininitial/internal/config"
 	"gininitial/internal/database"
+	"strconv"
 
 	"log/slog"
 	"os"
@@ -32,16 +33,15 @@ migrate-only mode for deploy pipelines / Kubernetes init containers:
 Main process runs migrations then starts HTTP unless SKIP_DB_MIGRATE=true (when migrate already ran).
 */
 func main() {
-	config.LoadEnv()
-
 	if len(os.Args) > 1 && os.Args[1] == "migrate" {
 		database.RunMigrateCommand()
 		return
 	}
 
-	port := os.Getenv("PORT")
+	port := strconv.Itoa(config.ENV.App.APP_PORT)
 	if port == "" {
-		port = "8080"
+		logger.Error("PORT is not set")
+		os.Exit(1)
 	}
 
 	db := database.InitDB()
@@ -63,9 +63,10 @@ func main() {
 		DB:     db,
 	}
 
-	healthPort := os.Getenv("HEALTH_CHECK_PORT")
+	healthPort := strconv.Itoa(config.ENV.App.APP_HEALTH_CHECK_PORT)
 	if healthPort == "" {
-		healthPort = "8040"
+		logger.Error("HEALTH_CHECK_PORT is not set")
+		os.Exit(1)
 	}
 	if healthPort == port {
 		logger.Error("PORT and HEALTH_CHECK_PORT must differ", slog.String("port", port), slog.String("healthCheckPort", healthPort))

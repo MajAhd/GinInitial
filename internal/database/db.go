@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
-	"gininitial/internal/config"
+	config "gininitial/internal/config"
 	"log/slog"
 	"net/url"
 	"os"
@@ -17,25 +17,13 @@ import (
 var logger *slog.Logger = config.InitLogger("database-service")
 
 func postgresDSNFromEnv() string {
-	host := os.Getenv("DB_HOSTNAME")
-	if host == "" {
-		host = "localhost"
-	}
-	port := os.Getenv("DB_PORT")
-	if port == "" {
-		port = "5432"
-	}
-	user := os.Getenv("DB_USERNAME")
-	if user == "" {
-		user = "postgres"
-	}
-	pass := os.Getenv("DB_PASSWORD")
-	dbname := os.Getenv("DB_DATABASE")
-	if dbname == "" {
-		dbname = "appdb"
-	}
-	sslmode := "require"
-	if os.Getenv("DB_SSL_DISABLED") == "true" {
+	host := config.ENV.DB.DB_HOSTNAME
+	port := config.ENV.DB.DB_PORT
+	user := config.ENV.DB.DB_USERNAME
+	pass := config.ENV.DB.DB_PASSWORD
+	dbname := config.ENV.DB.DB_DATABASE
+	sslmode := config.ENV.DB.DB_SSL_DISABLED
+	if sslmode == "true" {
 		sslmode = "disable"
 	}
 	u := &url.URL{
